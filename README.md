@@ -13,6 +13,7 @@ data CustomDatumType = CustomDatumType
   }
 ```
 
-The contract assumes the entry transaction validates the datum for equal length arrays or the UTxO will be perma locked. The contract will pay N addresses with some amount of lovelace. The goal of the contract is to maximize the number of payout addresses.
+The contract assumes the entry transaction validates the datum for equal length arrays or the UTxO will be perma locked. The contract will pay N addresses with some amount of lovelace greater than the minimum lovelace. The goal of the contract is to maximize the number of payout addresses as a proof of concept.
 
 This contract improves the the maximum payout address over the non-optimized contract by a factor of 3.
+

@@ -10,7 +10,7 @@ script_path="../group-payout-contract/group-payout-contract.plutus"
 script_address=$(${cli} address build --payment-script-file ${script_path} --testnet-magic ${testnet_magic})
 
 # wallet info
-staker_address=$(cat wallets/seller-wallet/payment.addr)
+payer_address=$(cat wallets/seller-wallet/payment.addr)
 reference_address=$(cat wallets/reference-wallet/payment.addr)
 collat_address=$(cat wallets/collat-wallet/payment.addr)
 
@@ -25,9 +25,9 @@ ${cli} query utxo --address ${script_address} --testnet-magic ${testnet_magic}
 echo -e "\033[0m"
 
 # staker / reward
-echo -e "\033[1;36m Staker Address:" 
-echo -e "\n${staker_address}\n";
-${cli} query utxo --address ${staker_address} --testnet-magic ${testnet_magic}
+echo -e "\033[1;36m Payer Address:" 
+echo -e "\n${payer_address}\n";
+${cli} query utxo --address ${payer_address} --testnet-magic ${testnet_magic}
 echo -e "\033[0m"
 
 # reference

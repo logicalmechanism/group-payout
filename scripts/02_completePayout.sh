@@ -16,20 +16,12 @@ collat_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/col
 lock_path="../group-payout-contract/group-payout-contract.plutus"
 script_address=$(${cli} address build --payment-script-file ${lock_path} --testnet-magic ${testnet_magic})
 
-payee_address=$(cat wallets/seller-wallet/payment.addr)
-payee_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/seller-wallet/payment.vkey)
+payer_address=$(cat wallets/seller-wallet/payment.addr)
+payer_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/seller-wallet/payment.vkey)
 
-outbound_address="addr_test1qrvnxkaylr4upwxfxctpxpcumj0fl6fdujdc72j8sgpraa9l4gu9er4t0w7udjvt2pqngddn6q4h8h3uv38p8p9cq82qav4lmp"
-
-outbound_address_out1="${outbound_address} + 2000000"
-outbound_address_out2="${outbound_address} + 2000001"
-outbound_address_out3="${outbound_address} + 2000002"
-outbound_address_out4="${outbound_address} + 2000003"
-outbound_address_out5="${outbound_address} + 2000004"
-outbound_address_out6="${outbound_address} + 2000005"
-outbound_address_out7="${outbound_address} + 2000006"
-outbound_address_out8="${outbound_address} + 2000007"
-echo "Remove OUTPUT: "${outbound_address_out}
+# generate outbound address from the payout.json file
+outs=$(jq -r --arg pay "" '[to_entries[] | $pay + "--tx-out \"" + .key + " + " + (.value | tostring) + "\""] | join(" ")' payout.json)
+echo "Remove OUTPUT: "${outs}
 #
 # exit
 #
@@ -46,20 +38,21 @@ if [ "${TXNS}" -eq "0" ]; then
 fi
 collat_utxo=$(jq -r 'keys[0]' tmp/collat_utxo.json)
 
+
 echo -e "\033[0;36m Gathering Seller UTxO Information  \033[0m"
 ${cli} query utxo \
     --testnet-magic ${testnet_magic} \
-    --address ${payee_address} \
-    --out-file tmp/payee_utxo.json
+    --address ${payer_address} \
+    --out-file tmp/payer_utxo.json
 
-TXNS=$(jq length tmp/payee_utxo.json)
+TXNS=$(jq length tmp/payer_utxo.json)
 if [ "${TXNS}" -eq "0" ]; then
-   echo -e "\n \033[0;31m NO UTxOs Found At ${payee_address} \033[0m \n";
+   echo -e "\n \033[0;31m NO UTxOs Found At ${payer_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' tmp/payee_utxo.json)
-payee_tx_in=${TXIN::-8}
+TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' tmp/payer_utxo.json)
+payer_tx_in=${TXIN::-8}
 
 # get script info
 echo -e "\033[0;36m Gathering Script UTxO Information  \033[0m"
@@ -81,19 +74,19 @@ script_tx_in=${TXIN::-8}
 script_ref_utxo=$(${cli} transaction txid --tx-file tmp/tx-reference-utxo.signed)
 
 echo -e "\033[0;36m Building Tx \033[0m"
-FEE=$(${cli} transaction build \
+FEE=$(eval ${cli} transaction build \
     --babbage-era \
     --protocol-params-file tmp/protocol.json \
     --out-file tmp/tx.draft \
-    --change-address ${payee_address} \
+    --change-address ${payer_address} \
     --tx-in-collateral="${collat_utxo}" \
-    --tx-in ${payee_tx_in} \
+    --tx-in ${payer_tx_in} \
     --tx-in ${script_tx_in} \
     --spending-tx-in-reference="${script_ref_utxo}#1" \
     --spending-plutus-script-v2 \
     --spending-reference-tx-in-inline-datum-present \
     --spending-reference-tx-in-redeemer-file data/redeemer/redeemer.json \
-    --tx-out="${outbound_address_out1}" \
+    $outs \
     --required-signer-hash ${collat_pkh} \
     --testnet-magic ${testnet_magic})
 

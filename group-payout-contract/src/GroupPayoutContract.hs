@@ -31,13 +31,12 @@ module GroupPayoutContract
 import qualified PlutusTx
 import           PlutusTx.Prelude
 import           Codec.Serialise
-import           Cardano.Api.Shelley                             ( PlutusScript (..)
-                                                                 , PlutusScriptV2 )
-import qualified Data.ByteString.Lazy                            as LBS
-import qualified Data.ByteString.Short                           as SBS
-import qualified Plutus.V2.Ledger.Contexts                       as V2
-import qualified Plutus.V2.Ledger.Api                            as V2
-import           UsefulFuncs (adaValue, createAddress)
+import           Cardano.Api.Shelley       ( PlutusScript (..) , PlutusScriptV2 )
+import qualified Data.ByteString.Lazy      as LBS
+import qualified Data.ByteString.Short     as SBS
+import qualified Plutus.V2.Ledger.Contexts as V2
+import qualified Plutus.V2.Ledger.Api      as V2
+import           UsefulFuncs               (adaValue, createAddress)
 import           Plutonomy
 {- |
   Author   : The Ancient Kraken
@@ -100,7 +99,7 @@ data PayoutScriptPurpose = Spending V2.TxOutRef
 PlutusTx.makeIsDataIndexed ''PayoutScriptPurpose [('Spending, 1)]
 
 data PayoutScriptContext = PayoutScriptContext
-  { scriptContextTxInfo :: PayoutTxInfo
+  { scriptContextTxInfo  :: PayoutTxInfo
   , scriptContextPurpose ::  PayoutScriptPurpose 
   }
 PlutusTx.unstableMakeIsData ''PayoutScriptContext
@@ -181,8 +180,7 @@ mkValidator datum _ context =
       !txOuts     = txInfoOutputs info
       !validInput = ownInput context
       !scriptAddr = txOutAddress validInput
-      in
-         (checkAllPayouts datum txOuts)  -- Make sure every address is paid
+      in (checkAllPayouts datum txOuts)  -- Make sure every address is paid
       && (nInputs txIns scriptAddr 1  )  -- singular script input
 -------------------------------------------------------------------------------
 -- | Now we need to compile the Validator.
