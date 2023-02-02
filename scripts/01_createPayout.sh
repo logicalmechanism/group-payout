@@ -16,7 +16,6 @@ script_address=$(${cli} address build --payment-script-file ${script_path} --tes
 payer_address=$(cat wallets/seller-wallet/payment.addr)
 payer_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/seller-wallet/payment.vkey)
 
-
 # update payout-datum.json with data from payout.json
 python createDatum.py
 
