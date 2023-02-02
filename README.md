@@ -5,11 +5,11 @@ The contract expects this datum structure.
 ```hs
 data CustomDatumType = CustomDatumType
   { pkhs :: [V2.PubKeyHash]
-  -- ^ The public key hahses
+  -- ^ The public key hashes.
   , scs  :: [V2.PubKeyHash]
-  -- ^ The staking credentials
+  -- ^ The staking credentials.
   , amts :: [Integer]
-  -- ^ The lovelace amounts
+  -- ^ The lovelace amounts.
   }
 ```
 
