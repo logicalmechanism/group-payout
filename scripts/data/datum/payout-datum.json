@@ -1,0 +1,26 @@
+{
+  "constructor": 0,
+  "fields": [
+    {
+      "list": [
+        {
+          "bytes": "d9335ba4f8ebc0b8c9361613071cdc9e9fe92de49b8f2a4782023ef4"
+        }
+      ]
+    },
+    {
+      "list": [
+        {
+          "bytes": "bfaa385c8eab7bbdc6c98b50413435b3d02b73de3c644e1384b801d4"
+        }
+      ]
+    },
+    {
+      "list": [
+        {
+          "int": 2000000
+        }
+      ]
+    }
+  ]
+}
